@@ -1,41 +1,95 @@
+using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using OrderManagement.Api.Observability;
+using OrderManagement.Api.Readiness;
+using OrderManagement.Application.Abstractions;
+using OrderManagement.Application.Services;
+using OrderManagement.Infrastructure;
+using OrderManagement.Infrastructure.Messaging;
+using OrderManagement.Infrastructure.Persistence;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+builder.Logging.ClearProviders();
+builder.Logging.AddJsonConsole();
+
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+        policy
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowAnyOrigin());
+});
+
+builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddScoped<IOrderService, OrderService>();
+
+builder.Services.AddHealthChecks()
+    .AddCheck<PostgresHealthCheck>("postgres")
+    .AddCheck<ServiceBusHealthCheck>("azure_service_bus");
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+app.UseExceptionHandler(exceptionApp =>
+{
+    exceptionApp.Run(async context =>
+    {
+        var feature = context.Features.Get<IExceptionHandlerPathFeature>();
+        var ex = feature?.Error;
+
+        var problem = new ProblemDetails
+        {
+            Title = "Unexpected error",
+            Status = StatusCodes.Status500InternalServerError,
+            Detail = app.Environment.IsDevelopment() ? ex?.ToString() : null,
+            Instance = context.Request.Path
+        };
+
+        context.Response.StatusCode = problem.Status.Value;
+        context.Response.ContentType = "application/problem+json";
+        await context.Response.WriteAsJsonAsync(problem);
+    });
+});
+
+app.UseMiddleware<CorrelationIdMiddleware>();
+app.UseCors();
+
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+app.MapControllers();
+app.MapHealthChecks("/health");
 
-var summaries = new[]
+// Auto-apply migrations on startup (MVP-friendly). In real prod you might separate this responsibility.
+using (var scope = app.Services.CreateScope())
 {
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    await db.Database.MigrateAsync();
 
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
+    // Nice DX: create queue if credentials allow it.
+    var admin = scope.ServiceProvider.GetRequiredService<ServiceBusAdministrationClientWrapper>().Client;
+    var queueName = app.Configuration["AZURE_SERVICE_BUS_QUEUE_NAME"] ?? "orders";
+    if (admin is not null)
+    {
+        try
+        {
+            if (!await admin.QueueExistsAsync(queueName))
+                await admin.CreateQueueAsync(queueName);
+        }
+        catch
+        {
+            // If the credentials don't have management rights, skip silently.
+        }
+    }
+}
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
