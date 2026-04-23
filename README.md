@@ -1,4 +1,4 @@
-# Gestão de Pedidos (Teste Técnico)
+# Gestão de Pedidos
 
 MVP de um sistema de gestão de pedidos com:
 
