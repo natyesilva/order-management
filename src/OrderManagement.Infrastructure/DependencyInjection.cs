@@ -5,6 +5,7 @@ using OrderManagement.Application.Abstractions;
 using OrderManagement.Application.Services;
 using OrderManagement.Infrastructure.Messaging;
 using OrderManagement.Infrastructure.Persistence;
+using Azure.Messaging.ServiceBus;
 
 namespace OrderManagement.Infrastructure;
 
@@ -28,8 +29,23 @@ public static class DependencyInjection
 
         services.AddSingleton<IClock, SystemClock>();
 
-        services.AddSingleton<RabbitMqConnectionFactory>();
-        services.AddScoped<IOrderEventPublisher, RabbitMqOrderEventPublisher>();
+        var transport = (configuration["ORDER_MESSAGING_TRANSPORT"] ?? "rabbitmq").Trim().ToLowerInvariant();
+
+        if (transport is "servicebus" or "asb" or "azure-service-bus")
+        {
+            var options = ServiceBusOptions.From(configuration);
+            if (string.IsNullOrWhiteSpace(options.ConnectionString))
+                throw new InvalidOperationException("Azure Service Bus transport selected, but AZURE_SERVICEBUS_CONNECTION_STRING is missing.");
+
+            services.AddSingleton(options);
+            services.AddSingleton(_ => new ServiceBusClient(options.ConnectionString));
+            services.AddScoped<IOrderEventPublisher, AzureServiceBusOrderEventPublisher>();
+        }
+        else
+        {
+            services.AddSingleton<RabbitMqConnectionFactory>();
+            services.AddScoped<IOrderEventPublisher, RabbitMqOrderEventPublisher>();
+        }
 
         return services;
     }

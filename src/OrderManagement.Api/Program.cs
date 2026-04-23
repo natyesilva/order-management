@@ -8,6 +8,7 @@ using OrderManagement.Application.Abstractions;
 using OrderManagement.Application.Services;
 using OrderManagement.Infrastructure;
 using OrderManagement.Infrastructure.Persistence;
+using OrderManagement.Infrastructure.Messaging;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,9 +37,20 @@ builder.Services.AddCors(options =>
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddScoped<IOrderService, OrderService>();
 
-builder.Services.AddHealthChecks()
-    .AddCheck<PostgresHealthCheck>("postgres")
-    .AddCheck<RabbitMqHealthCheck>("rabbitmq");
+var transport = (builder.Configuration["ORDER_MESSAGING_TRANSPORT"] ?? "rabbitmq").Trim().ToLowerInvariant();
+var health = builder.Services.AddHealthChecks()
+    .AddCheck<PostgresHealthCheck>("postgres");
+
+if (transport is "servicebus" or "asb" or "azure-service-bus")
+{
+    // ServiceBusClient/ServiceBusOptions are registered by AddInfrastructure when transport=servicebus.
+    health.AddCheck<AzureServiceBusHealthCheck>("servicebus");
+}
+else
+{
+    // RabbitMqConnectionFactory is registered by AddInfrastructure when transport=rabbitmq.
+    health.AddCheck<RabbitMqHealthCheck>("rabbitmq");
+}
 
 var app = builder.Build();
 
