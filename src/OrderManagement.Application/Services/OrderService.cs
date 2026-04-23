@@ -18,12 +18,13 @@ public sealed class OrderService(
     // Infrastructure provides the concrete AppDbContext (registered as DbContext).
     private readonly DbContext _db = dbContext;
 
-    public async Task<OrderResponse> CreateAsync(CreateOrderRequest request, string correlationId, CancellationToken cancellationToken)
+    public async Task<OrderResponse> CreateAsync(CreateOrderRequest request, Guid orderId, string correlationId, CancellationToken cancellationToken)
     {
+        var eventType = "OrderCreated";
         var now = clock.UtcNow;
         var order = new Order
         {
-            Id = Guid.NewGuid(),
+            Id = orderId,
             Customer = request.Customer.Trim(),
             Product = request.Product.Trim(),
             Value = request.Value,
@@ -46,7 +47,15 @@ public sealed class OrderService(
         _db.Add(order);
         await _db.SaveChangesAsync(cancellationToken);
 
-        logger.LogInformation("Pedido criado: {OrderId}", order.Id);
+        using (logger.BeginScope(new Dictionary<string, object>
+        {
+            ["orderId"] = order.Id,
+            ["correlationId"] = correlationId,
+            ["eventType"] = eventType,
+        }))
+        {
+            logger.LogInformation("Pedido criado.");
+        }
 
         await publisher.PublishAsync(
             new OrderCreatedEvent(order.Id, order.Customer, order.Product, order.Value, order.Quantity, order.TotalValue, order.CreatedAt),

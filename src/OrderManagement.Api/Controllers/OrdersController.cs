@@ -14,8 +14,14 @@ public sealed class OrdersController(IOrderService orders) : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Create([FromBody] CreateOrderRequest request, CancellationToken cancellationToken)
     {
-        var correlationId = HttpContext.Items[CorrelationIdMiddleware.HeaderName]?.ToString() ?? Guid.NewGuid().ToString();
-        var created = await orders.CreateAsync(request, correlationId, cancellationToken);
+        // For end-to-end tracing, we set CorrelationId = OrderId for the creation flow.
+        var orderId = Guid.NewGuid();
+        var correlationId = orderId.ToString();
+
+        HttpContext.Items[CorrelationIdMiddleware.HeaderName] = correlationId;
+        Response.Headers[CorrelationIdMiddleware.HeaderName] = correlationId;
+
+        var created = await orders.CreateAsync(request, orderId, correlationId, cancellationToken);
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 
@@ -36,4 +42,3 @@ public sealed class OrdersController(IOrderService orders) : ControllerBase
         return order is null ? NotFound() : Ok(order);
     }
 }
-

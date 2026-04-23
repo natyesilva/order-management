@@ -64,6 +64,12 @@ public sealed class AzureServiceBusOrderCreatedWorker(
                 return;
             }
 
+            using var _orderScope = logger.BeginScope(new Dictionary<string, object>
+            {
+                ["orderId"] = payload.OrderId,
+                ["eventType"] = eventType ?? ""
+            });
+
             try
             {
                 await processor.ProcessAsync(payload, messageId, correlationId, stoppingToken);

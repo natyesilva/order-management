@@ -3,7 +3,7 @@ export const messages = {
     appTitle: 'Gestão de Pedidos',
     navOrders: 'Pedidos',
     navNew: 'Novo',
-    footerNote: 'UI local de desenvolvimento para o teste técnico.',
+    footerNote: 'UI local de desenvolvimento.',
 
     ordersTitle: 'Pedidos',
     ordersSubtitle: 'As atualizações de status são aplicadas de forma assíncrona pelo worker.',
@@ -48,7 +48,7 @@ export const messages = {
     appTitle: 'Order Management',
     navOrders: 'Orders',
     navNew: 'New',
-    footerNote: 'Local dev UI for technical test.',
+    footerNote: 'Local development UI.',
 
     ordersTitle: 'Orders',
     ordersSubtitle: 'Status updates are applied asynchronously by the worker.',
