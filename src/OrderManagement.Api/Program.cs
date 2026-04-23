@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 using OrderManagement.Api.Observability;
 using OrderManagement.Api.Readiness;
 using OrderManagement.Application.Abstractions;
 using OrderManagement.Application.Services;
 using OrderManagement.Infrastructure;
-using OrderManagement.Infrastructure.Messaging;
 using OrderManagement.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,7 +14,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Logging.ClearProviders();
 builder.Logging.AddJsonConsole();
 
-builder.Services.AddControllers();
+builder.Services
+    .AddControllers()
+    .AddJsonOptions(options =>
+    {
+        // Ensure enums (OrderStatus) are serialized as strings so the UI shows "Pending" etc (not 0/1/2).
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -32,7 +38,7 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 
 builder.Services.AddHealthChecks()
     .AddCheck<PostgresHealthCheck>("postgres")
-    .AddCheck<ServiceBusHealthCheck>("azure_service_bus");
+    .AddCheck<RabbitMqHealthCheck>("rabbitmq");
 
 var app = builder.Build();
 
@@ -99,24 +105,6 @@ using (var scope = app.Services.CreateScope())
         await db.Database.EnsureCreatedAsync();
     }
 
-    if (MessagingTransport.IsServiceBus(app.Configuration))
-    {
-        // Nice DX: create queue if credentials allow it.
-        var admin = scope.ServiceProvider.GetRequiredService<ServiceBusAdministrationClientWrapper>().Client;
-        var queueName = app.Configuration["AZURE_SERVICE_BUS_QUEUE_NAME"] ?? "orders";
-        if (admin is not null)
-        {
-            try
-            {
-                if (!await admin.QueueExistsAsync(queueName))
-                    await admin.CreateQueueAsync(queueName);
-            }
-            catch
-            {
-                // If the credentials don't have management rights, skip silently.
-            }
-        }
-    }
 }
 
 app.Run();

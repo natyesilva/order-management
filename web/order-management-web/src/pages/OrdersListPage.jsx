@@ -4,7 +4,7 @@ import StatusBadge from '../components/StatusBadge.jsx'
 import { listOrders } from '../lib/api.js'
 
 function money(value) {
-  return new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' }).format(value)
+  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)
 }
 
 export default function OrdersListPage() {

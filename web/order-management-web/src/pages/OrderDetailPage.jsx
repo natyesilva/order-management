@@ -4,7 +4,17 @@ import StatusBadge from '../components/StatusBadge.jsx'
 import { getOrder } from '../lib/api.js'
 
 function money(value) {
-  return new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' }).format(value)
+  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)
+}
+
+const statusLabels = {
+  Pending: 'Pendente',
+  Processing: 'Processando',
+  Completed: 'Concluído',
+}
+
+function statusLabel(status) {
+  return statusLabels[status] || status
 }
 
 export default function OrderDetailPage() {
@@ -97,13 +107,16 @@ export default function OrderDetailPage() {
                 order.statusHistory.map((h) => (
                   <div key={h.id} className="rounded-xl bg-white/70 p-3 ring-1 ring-black/5">
                     <div className="flex items-center justify-between gap-3">
-                      <div className="text-sm font-medium text-ink-900">{h.newStatus}</div>
+                      <div className="text-sm font-medium text-ink-900">
+                        <StatusBadge status={h.newStatus} />
+                      </div>
                       <div className="text-xs text-ink-700">
                         {new Date(h.changedAt).toLocaleTimeString()}
                       </div>
                     </div>
                     <div className="mt-1 text-xs text-ink-700">
-                      de {h.previousStatus ?? '—'} via <span className="font-mono">{h.source}</span>
+                      de {h.previousStatus ? statusLabel(h.previousStatus) : '—'} via{' '}
+                      <span className="font-mono">{h.source}</span>
                     </div>
                   </div>
                 ))

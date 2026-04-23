@@ -11,11 +11,6 @@ D:\order-management\src\OrderManagement.Worker\bin\Release\net8.0\OrderManagemen
 D:\order-management\src\OrderManagement.Worker\bin\Release\net8.0\OrderManagement.Worker.runtimeconfig.json
 D:\order-management\src\OrderManagement.Worker\bin\Release\net8.0\OrderManagement.Worker.dll
 D:\order-management\src\OrderManagement.Worker\bin\Release\net8.0\OrderManagement.Worker.pdb
-D:\order-management\src\OrderManagement.Worker\bin\Release\net8.0\Azure.Core.dll
-D:\order-management\src\OrderManagement.Worker\bin\Release\net8.0\Azure.Core.Amqp.dll
-D:\order-management\src\OrderManagement.Worker\bin\Release\net8.0\Azure.Messaging.ServiceBus.dll
-D:\order-management\src\OrderManagement.Worker\bin\Release\net8.0\Microsoft.Azure.Amqp.dll
-D:\order-management\src\OrderManagement.Worker\bin\Release\net8.0\Microsoft.Bcl.AsyncInterfaces.dll
 D:\order-management\src\OrderManagement.Worker\bin\Release\net8.0\Microsoft.EntityFrameworkCore.dll
 D:\order-management\src\OrderManagement.Worker\bin\Release\net8.0\Microsoft.EntityFrameworkCore.Abstractions.dll
 D:\order-management\src\OrderManagement.Worker\bin\Release\net8.0\Microsoft.EntityFrameworkCore.Relational.dll
@@ -51,9 +46,7 @@ D:\order-management\src\OrderManagement.Worker\bin\Release\net8.0\Microsoft.Exte
 D:\order-management\src\OrderManagement.Worker\bin\Release\net8.0\Microsoft.Extensions.Primitives.dll
 D:\order-management\src\OrderManagement.Worker\bin\Release\net8.0\Npgsql.dll
 D:\order-management\src\OrderManagement.Worker\bin\Release\net8.0\Npgsql.EntityFrameworkCore.PostgreSQL.dll
-D:\order-management\src\OrderManagement.Worker\bin\Release\net8.0\System.ClientModel.dll
 D:\order-management\src\OrderManagement.Worker\bin\Release\net8.0\System.Diagnostics.EventLog.dll
-D:\order-management\src\OrderManagement.Worker\bin\Release\net8.0\System.Memory.Data.dll
 D:\order-management\src\OrderManagement.Worker\bin\Release\net8.0\runtimes\win\lib\net8.0\System.Diagnostics.EventLog.Messages.dll
 D:\order-management\src\OrderManagement.Worker\bin\Release\net8.0\runtimes\win\lib\net8.0\System.Diagnostics.EventLog.dll
 D:\order-management\src\OrderManagement.Worker\bin\Release\net8.0\OrderManagement.Application.dll
@@ -68,3 +61,4 @@ D:\order-management\src\OrderManagement.Worker\obj\Release\net8.0\refint\OrderMa
 D:\order-management\src\OrderManagement.Worker\obj\Release\net8.0\OrderManagement.Worker.pdb
 D:\order-management\src\OrderManagement.Worker\obj\Release\net8.0\OrderManagement.Worker.genruntimeconfig.cache
 D:\order-management\src\OrderManagement.Worker\obj\Release\net8.0\ref\OrderManagement.Worker.dll
+D:\order-management\src\OrderManagement.Worker\bin\Release\net8.0\RabbitMQ.Client.dll

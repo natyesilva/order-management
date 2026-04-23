@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("OrderManagement.Infrastructure")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6463d6d60274d388e16d72e4f606b761fc3a540b")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+cd197b4773dd458de79fc1181bafc836018dfb41")]
 [assembly: System.Reflection.AssemblyProductAttribute("OrderManagement.Infrastructure")]
 [assembly: System.Reflection.AssemblyTitleAttribute("OrderManagement.Infrastructure")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -1,4 +1,3 @@
-using Azure.Messaging.ServiceBus;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,26 +28,8 @@ public static class DependencyInjection
 
         services.AddSingleton<IClock, SystemClock>();
 
-        services.AddSingleton<ServiceBusAdministrationClientWrapper>();
-
-        var transport = MessagingTransport.Get(configuration);
-        var sbConnectionString = configuration["AZURE_SERVICE_BUS_CONNECTION_STRING"];
-        if (transport == "servicebus")
-        {
-            if (string.IsNullOrWhiteSpace(sbConnectionString))
-                throw new InvalidOperationException("ORDER_MESSAGING_TRANSPORT=servicebus requires AZURE_SERVICE_BUS_CONNECTION_STRING.");
-
-            services.AddSingleton(_ => new ServiceBusClient(sbConnectionString));
-            services.AddScoped<IOrderEventPublisher, AzureServiceBusOrderEventPublisher>();
-        }
-        else if (transport == "outbox")
-        {
-            services.AddScoped<IOrderEventPublisher, PostgresOutboxOrderEventPublisher>();
-        }
-        else
-        {
-            throw new InvalidOperationException($"Unsupported {MessagingTransport.ConfigKey} value: '{transport}'. Use 'outbox' or 'servicebus'.");
-        }
+        services.AddSingleton<RabbitMqConnectionFactory>();
+        services.AddScoped<IOrderEventPublisher, RabbitMqOrderEventPublisher>();
 
         return services;
     }
