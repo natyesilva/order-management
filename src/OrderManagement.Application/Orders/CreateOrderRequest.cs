@@ -16,5 +16,7 @@ public sealed class CreateOrderRequest
 
     [Range(typeof(decimal), "0.01", "79228162514264337593543950335")]
     public decimal Value { get; set; }
-}
 
+    [Range(1, int.MaxValue)]
+    public int Quantity { get; set; } = 1;
+}

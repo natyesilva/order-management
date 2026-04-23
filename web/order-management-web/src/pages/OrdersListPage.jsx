@@ -62,6 +62,8 @@ export default function OrdersListPage() {
                 <th className="px-4 py-3 font-medium">{t('thCustomer')}</th>
                 <th className="px-4 py-3 font-medium">{t('thProduct')}</th>
                 <th className="px-4 py-3 font-medium">{t('thValue')}</th>
+                <th className="px-4 py-3 font-medium">{t('thQuantity')}</th>
+                <th className="px-4 py-3 font-medium">{t('thTotalValue')}</th>
                 <th className="px-4 py-3 font-medium">{t('thStatus')}</th>
                 <th className="px-4 py-3 font-medium">{t('thCreatedAt')}</th>
                 <th className="px-4 py-3 font-medium"></th>
@@ -70,19 +72,19 @@ export default function OrdersListPage() {
             <tbody className="divide-y divide-black/5">
               {loading ? (
                 <tr>
-                  <td className="px-4 py-6 text-ink-700" colSpan={6}>
+                  <td className="px-4 py-6 text-ink-700" colSpan={8}>
                     {t('loading')}
                   </td>
                 </tr>
               ) : error ? (
                 <tr>
-                  <td className="px-4 py-6 text-red-700" colSpan={6}>
+                  <td className="px-4 py-6 text-red-700" colSpan={8}>
                     {error}
                   </td>
                 </tr>
               ) : orders.length === 0 ? (
                 <tr>
-                  <td className="px-4 py-6 text-ink-700" colSpan={6}>
+                  <td className="px-4 py-6 text-ink-700" colSpan={8}>
                     {t('noOrders')}
                   </td>
                 </tr>
@@ -92,6 +94,8 @@ export default function OrdersListPage() {
                     <td className="px-4 py-3 font-medium text-ink-900">{o.customer}</td>
                     <td className="px-4 py-3 text-ink-700">{o.product}</td>
                     <td className="px-4 py-3 text-ink-900">{money(o.value, locale)}</td>
+                    <td className="px-4 py-3 text-ink-900">{o.quantity}</td>
+                    <td className="px-4 py-3 text-ink-900">{money(o.totalValue, locale)}</td>
                     <td className="px-4 py-3">
                       <StatusBadge status={o.status} />
                     </td>

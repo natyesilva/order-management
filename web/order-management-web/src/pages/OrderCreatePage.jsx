@@ -9,6 +9,7 @@ export default function OrderCreatePage() {
   const [customer, setCustomer] = useState('')
   const [product, setProduct] = useState('')
   const [value, setValue] = useState('10.00')
+  const [quantity, setQuantity] = useState('1')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState(null)
 
@@ -21,6 +22,7 @@ export default function OrderCreatePage() {
         customer,
         product,
         value: Number(value),
+        quantity: Number(quantity),
       }
       const created = await createOrder(payload)
       navigate(`/orders/${created.id}`)
@@ -76,6 +78,19 @@ export default function OrderCreatePage() {
             type="number"
             step="0.01"
             min="0.01"
+            className="mt-1 w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm outline-none ring-teal-200 focus:ring-4"
+            required
+          />
+        </label>
+
+        <label className="mt-4 block">
+          <span className="text-sm font-medium text-ink-900">{t('quantity')}</span>
+          <input
+            value={quantity}
+            onChange={(e) => setQuantity(e.target.value)}
+            type="number"
+            step="1"
+            min="1"
             className="mt-1 w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm outline-none ring-teal-200 focus:ring-4"
             required
           />

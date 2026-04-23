@@ -20,6 +20,8 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
             b.Property(x => x.Customer).HasMaxLength(200).IsRequired();
             b.Property(x => x.Product).HasMaxLength(200).IsRequired();
             b.Property(x => x.Value).HasColumnType("numeric(18,2)").IsRequired();
+            b.Property(x => x.Quantity).IsRequired();
+            b.Property(x => x.TotalValue).HasColumnType("numeric(18,2)").IsRequired();
 
             b.Property(x => x.Status).IsRequired();
             b.Property(x => x.CreatedAt).IsRequired();
