@@ -112,6 +112,46 @@ partial class AppDbContextModelSnapshot : ModelSnapshot
             b.ToTable("processed_messages", (string)null);
         });
 
+        modelBuilder.Entity("OrderManagement.Domain.Entities.OutboxMessage", b =>
+        {
+            b.Property<Guid>("Id")
+                .HasColumnType("uuid");
+
+            b.Property<string>("CorrelationId")
+                .IsRequired()
+                .HasMaxLength(200)
+                .HasColumnType("character varying(200)");
+
+            b.Property<DateTimeOffset>("CreatedAt")
+                .HasColumnType("timestamp with time zone");
+
+            b.Property<string>("EventType")
+                .IsRequired()
+                .HasMaxLength(100)
+                .HasColumnType("character varying(100)");
+
+            b.Property<string>("MessageId")
+                .IsRequired()
+                .HasMaxLength(200)
+                .HasColumnType("character varying(200)");
+
+            b.Property<string>("Payload")
+                .IsRequired()
+                .HasColumnType("jsonb");
+
+            b.Property<DateTimeOffset?>("ProcessedAt")
+                .HasColumnType("timestamp with time zone");
+
+            b.HasKey("Id");
+
+            b.HasIndex("EventType", "ProcessedAt", "CreatedAt");
+
+            b.HasIndex("MessageId")
+                .IsUnique();
+
+            b.ToTable("outbox_messages", (string)null);
+        });
+
         modelBuilder.Entity("OrderManagement.Domain.Entities.OrderStatusHistory", b =>
         {
             b.HasOne("OrderManagement.Domain.Entities.Order", "Order")
@@ -129,4 +169,3 @@ partial class AppDbContextModelSnapshot : ModelSnapshot
         });
     }
 }
-

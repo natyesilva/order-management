@@ -75,19 +75,22 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     await db.Database.MigrateAsync();
 
-    // Nice DX: create queue if credentials allow it.
-    var admin = scope.ServiceProvider.GetRequiredService<ServiceBusAdministrationClientWrapper>().Client;
-    var queueName = app.Configuration["AZURE_SERVICE_BUS_QUEUE_NAME"] ?? "orders";
-    if (admin is not null)
+    if (MessagingTransport.IsServiceBus(app.Configuration))
     {
-        try
+        // Nice DX: create queue if credentials allow it.
+        var admin = scope.ServiceProvider.GetRequiredService<ServiceBusAdministrationClientWrapper>().Client;
+        var queueName = app.Configuration["AZURE_SERVICE_BUS_QUEUE_NAME"] ?? "orders";
+        if (admin is not null)
         {
-            if (!await admin.QueueExistsAsync(queueName))
-                await admin.CreateQueueAsync(queueName);
-        }
-        catch
-        {
-            // If the credentials don't have management rights, skip silently.
+            try
+            {
+                if (!await admin.QueueExistsAsync(queueName))
+                    await admin.CreateQueueAsync(queueName);
+            }
+            catch
+            {
+                // If the credentials don't have management rights, skip silently.
+            }
         }
     }
 }

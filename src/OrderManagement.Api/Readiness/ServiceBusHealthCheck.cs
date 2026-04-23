@@ -12,6 +12,9 @@ public sealed class ServiceBusHealthCheck(
         HealthCheckContext context,
         CancellationToken cancellationToken = default)
     {
+        if (MessagingTransport.IsOutbox(configuration))
+            return HealthCheckResult.Healthy("Using Postgres outbox transport.");
+
         var cs = configuration["AZURE_SERVICE_BUS_CONNECTION_STRING"];
         if (string.IsNullOrWhiteSpace(cs))
             return HealthCheckResult.Unhealthy("Azure Service Bus is not configured.");
@@ -37,4 +40,3 @@ public sealed class ServiceBusHealthCheck(
         }
     }
 }
-

@@ -8,6 +8,7 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
     public DbSet<Order> Orders => Set<Order>();
     public DbSet<OrderStatusHistory> OrderStatusHistories => Set<OrderStatusHistory>();
     public DbSet<ProcessedMessage> ProcessedMessages => Set<ProcessedMessage>();
+    public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -53,6 +54,21 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
 
             b.HasIndex(x => x.MessageId).IsUnique();
         });
+
+        modelBuilder.Entity<OutboxMessage>(b =>
+        {
+            b.ToTable("outbox_messages");
+            b.HasKey(x => x.Id);
+
+            b.Property(x => x.MessageId).HasMaxLength(200).IsRequired();
+            b.Property(x => x.CorrelationId).HasMaxLength(200).IsRequired();
+            b.Property(x => x.EventType).HasMaxLength(100).IsRequired();
+            b.Property(x => x.Payload).HasColumnType("jsonb").IsRequired();
+            b.Property(x => x.CreatedAt).IsRequired();
+            b.Property(x => x.ProcessedAt);
+
+            b.HasIndex(x => x.MessageId).IsUnique();
+            b.HasIndex(x => new { x.EventType, x.ProcessedAt, x.CreatedAt });
+        });
     }
 }
-

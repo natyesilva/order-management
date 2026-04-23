@@ -38,6 +38,7 @@ services:
     environment:
       ASPNETCORE_URLS: http://0.0.0.0:8080
       POSTGRES_CONNECTION_STRING: Host=postgres;Port=5432;Database=${POSTGRES_DB:-order_management};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:-postgres}
+      ORDER_MESSAGING_TRANSPORT: ${ORDER_MESSAGING_TRANSPORT:-outbox}
       AZURE_SERVICE_BUS_CONNECTION_STRING: ${AZURE_SERVICE_BUS_CONNECTION_STRING}
       AZURE_SERVICE_BUS_QUEUE_NAME: ${AZURE_SERVICE_BUS_QUEUE_NAME:-orders}
     ports:
@@ -57,6 +58,7 @@ services:
       dockerfile: src/OrderManagement.Worker/Dockerfile
     environment:
       POSTGRES_CONNECTION_STRING: Host=postgres;Port=5432;Database=${POSTGRES_DB:-order_management};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:-postgres}
+      ORDER_MESSAGING_TRANSPORT: ${ORDER_MESSAGING_TRANSPORT:-outbox}
       AZURE_SERVICE_BUS_CONNECTION_STRING: ${AZURE_SERVICE_BUS_CONNECTION_STRING}
       AZURE_SERVICE_BUS_QUEUE_NAME: ${AZURE_SERVICE_BUS_QUEUE_NAME:-orders}
     depends_on:
@@ -85,4 +87,3 @@ services:
 
 volumes:
   postgres_data:
-

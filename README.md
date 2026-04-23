@@ -37,11 +37,15 @@ flowchart LR
 
 Prereqs:
 - Docker Desktop
-- An Azure Service Bus namespace + a connection string (see below)
+- Messaging transport:
+  - Default: Postgres outbox (no Azure required)
+  - Optional: Azure Service Bus (see below)
 
 1) Create `.env` from `.env.example` and fill:
-- `AZURE_SERVICE_BUS_CONNECTION_STRING`
-- optionally `AZURE_SERVICE_BUS_QUEUE_NAME` (default `orders`)
+- `ORDER_MESSAGING_TRANSPORT` (`outbox` or `servicebus`)
+- if `servicebus`:
+  - `AZURE_SERVICE_BUS_CONNECTION_STRING`
+  - optionally `AZURE_SERVICE_BUS_QUEUE_NAME` (default `orders`)
 
 2) Start everything:
 
@@ -57,7 +61,7 @@ Services:
 
 Notes:
 - The API applies EF Core migrations automatically on startup.
-- The API attempts to create the queue if the Service Bus credentials include management rights.
+- If using Service Bus, the API attempts to create the queue if the credentials include management rights.
 
 ## Azure Service Bus setup
 
@@ -124,4 +128,3 @@ Response (201):
 - `src/OrderManagement.Api`: controllers + middleware + health checks
 - `src/OrderManagement.Worker`: Service Bus consumer + idempotency + status transitions
 - `web/order-management-web`: React UI (Tailwind + polling)
-

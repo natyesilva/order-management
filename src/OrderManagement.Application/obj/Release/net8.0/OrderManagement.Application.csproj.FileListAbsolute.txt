@@ -1,0 +1,16 @@
+D:\order-management\src\OrderManagement.Application\obj\Release\net8.0\OrderManagement.Application.csproj.AssemblyReference.cache
+D:\order-management\src\OrderManagement.Application\obj\Release\net8.0\OrderManagement.Application.GeneratedMSBuildEditorConfig.editorconfig
+D:\order-management\src\OrderManagement.Application\obj\Release\net8.0\OrderManagement.Application.AssemblyInfoInputs.cache
+D:\order-management\src\OrderManagement.Application\obj\Release\net8.0\OrderManagement.Application.AssemblyInfo.cs
+D:\order-management\src\OrderManagement.Application\obj\Release\net8.0\OrderManagement.Application.csproj.CoreCompileInputs.cache
+D:\order-management\src\OrderManagement.Application\obj\Release\net8.0\OrderManagement.Application.sourcelink.json
+D:\order-management\src\OrderManagement.Application\bin\Release\net8.0\OrderManagement.Application.deps.json
+D:\order-management\src\OrderManagement.Application\bin\Release\net8.0\OrderManagement.Application.dll
+D:\order-management\src\OrderManagement.Application\bin\Release\net8.0\OrderManagement.Application.pdb
+D:\order-management\src\OrderManagement.Application\bin\Release\net8.0\OrderManagement.Domain.dll
+D:\order-management\src\OrderManagement.Application\bin\Release\net8.0\OrderManagement.Domain.pdb
+D:\order-management\src\OrderManagement.Application\obj\Release\net8.0\OrderMan.B2E1D241.Up2Date
+D:\order-management\src\OrderManagement.Application\obj\Release\net8.0\OrderManagement.Application.dll
+D:\order-management\src\OrderManagement.Application\obj\Release\net8.0\refint\OrderManagement.Application.dll
+D:\order-management\src\OrderManagement.Application\obj\Release\net8.0\OrderManagement.Application.pdb
+D:\order-management\src\OrderManagement.Application\obj\Release\net8.0\ref\OrderManagement.Application.dll

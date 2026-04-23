@@ -31,16 +31,23 @@ public static class DependencyInjection
 
         services.AddSingleton<ServiceBusAdministrationClientWrapper>();
 
+        var transport = MessagingTransport.Get(configuration);
         var sbConnectionString = configuration["AZURE_SERVICE_BUS_CONNECTION_STRING"];
-        if (!string.IsNullOrWhiteSpace(sbConnectionString))
+        if (transport == "servicebus")
         {
+            if (string.IsNullOrWhiteSpace(sbConnectionString))
+                throw new InvalidOperationException("ORDER_MESSAGING_TRANSPORT=servicebus requires AZURE_SERVICE_BUS_CONNECTION_STRING.");
+
             services.AddSingleton(_ => new ServiceBusClient(sbConnectionString));
-            services.AddSingleton<IOrderEventPublisher, AzureServiceBusOrderEventPublisher>();
+            services.AddScoped<IOrderEventPublisher, AzureServiceBusOrderEventPublisher>();
+        }
+        else if (transport == "outbox")
+        {
+            services.AddScoped<IOrderEventPublisher, PostgresOutboxOrderEventPublisher>();
         }
         else
         {
-            // Still register publisher so the app boots and fails with a clear error on use.
-            services.AddSingleton<IOrderEventPublisher, MissingServiceBusOrderEventPublisher>();
+            throw new InvalidOperationException($"Unsupported {MessagingTransport.ConfigKey} value: '{transport}'. Use 'outbox' or 'servicebus'.");
         }
 
         return services;

@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using OrderManagement.Application.Abstractions;
 using OrderManagement.Application.Messages;
 using OrderManagement.Application.Orders;
@@ -92,4 +93,3 @@ public sealed class OrderService(
                 .ToList());
     }
 }
-

@@ -1,0 +1,12 @@
+D:\order-management\src\OrderManagement.Domain\bin\Release\net8.0\OrderManagement.Domain.deps.json
+D:\order-management\src\OrderManagement.Domain\bin\Release\net8.0\OrderManagement.Domain.dll
+D:\order-management\src\OrderManagement.Domain\bin\Release\net8.0\OrderManagement.Domain.pdb
+D:\order-management\src\OrderManagement.Domain\obj\Release\net8.0\OrderManagement.Domain.GeneratedMSBuildEditorConfig.editorconfig
+D:\order-management\src\OrderManagement.Domain\obj\Release\net8.0\OrderManagement.Domain.AssemblyInfoInputs.cache
+D:\order-management\src\OrderManagement.Domain\obj\Release\net8.0\OrderManagement.Domain.AssemblyInfo.cs
+D:\order-management\src\OrderManagement.Domain\obj\Release\net8.0\OrderManagement.Domain.csproj.CoreCompileInputs.cache
+D:\order-management\src\OrderManagement.Domain\obj\Release\net8.0\OrderManagement.Domain.sourcelink.json
+D:\order-management\src\OrderManagement.Domain\obj\Release\net8.0\OrderManagement.Domain.dll
+D:\order-management\src\OrderManagement.Domain\obj\Release\net8.0\refint\OrderManagement.Domain.dll
+D:\order-management\src\OrderManagement.Domain\obj\Release\net8.0\OrderManagement.Domain.pdb
+D:\order-management\src\OrderManagement.Domain\obj\Release\net8.0\ref\OrderManagement.Domain.dll
