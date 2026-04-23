@@ -2,12 +2,15 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import StatusBadge from '../components/StatusBadge.jsx'
 import { listOrders } from '../lib/api.js'
+import { useI18n } from '../lib/i18n/I18nProvider.jsx'
 
-function money(value) {
-  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)
+function money(value, locale) {
+  const currency = locale === 'pt-BR' ? 'BRL' : 'USD'
+  return new Intl.NumberFormat(locale, { style: 'currency', currency }).format(value)
 }
 
 export default function OrdersListPage() {
+  const { locale, t } = useI18n()
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -40,16 +43,14 @@ export default function OrdersListPage() {
     <div className="space-y-4">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-ink-900">Pedidos</h1>
-          <p className="mt-1 text-sm text-ink-700">
-            As atualizações de status são aplicadas de forma assíncrona pelo worker.
-          </p>
+          <h1 className="text-2xl font-semibold tracking-tight text-ink-900">{t('ordersTitle')}</h1>
+          <p className="mt-1 text-sm text-ink-700">{t('ordersSubtitle')}</p>
         </div>
         <Link
           to="/orders/new"
           className="inline-flex items-center justify-center rounded-xl bg-ink-900 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-ink-700"
         >
-          Criar pedido
+          {t('createOrderCta')}
         </Link>
       </div>
 
@@ -58,11 +59,11 @@ export default function OrdersListPage() {
           <table className="min-w-full text-left text-sm">
             <thead className="border-b border-black/5 bg-white/50">
               <tr className="text-ink-700">
-                <th className="px-4 py-3 font-medium">Cliente</th>
-                <th className="px-4 py-3 font-medium">Produto</th>
-                <th className="px-4 py-3 font-medium">Valor</th>
-                <th className="px-4 py-3 font-medium">Status</th>
-                <th className="px-4 py-3 font-medium">Criado em</th>
+                <th className="px-4 py-3 font-medium">{t('thCustomer')}</th>
+                <th className="px-4 py-3 font-medium">{t('thProduct')}</th>
+                <th className="px-4 py-3 font-medium">{t('thValue')}</th>
+                <th className="px-4 py-3 font-medium">{t('thStatus')}</th>
+                <th className="px-4 py-3 font-medium">{t('thCreatedAt')}</th>
                 <th className="px-4 py-3 font-medium"></th>
               </tr>
             </thead>
@@ -70,7 +71,7 @@ export default function OrdersListPage() {
               {loading ? (
                 <tr>
                   <td className="px-4 py-6 text-ink-700" colSpan={6}>
-                    Carregando...
+                    {t('loading')}
                   </td>
                 </tr>
               ) : error ? (
@@ -82,7 +83,7 @@ export default function OrdersListPage() {
               ) : orders.length === 0 ? (
                 <tr>
                   <td className="px-4 py-6 text-ink-700" colSpan={6}>
-                    Nenhum pedido ainda.
+                    {t('noOrders')}
                   </td>
                 </tr>
               ) : (
@@ -90,19 +91,19 @@ export default function OrdersListPage() {
                   <tr key={o.id} className="hover:bg-white/60">
                     <td className="px-4 py-3 font-medium text-ink-900">{o.customer}</td>
                     <td className="px-4 py-3 text-ink-700">{o.product}</td>
-                    <td className="px-4 py-3 text-ink-900">{money(o.value)}</td>
+                    <td className="px-4 py-3 text-ink-900">{money(o.value, locale)}</td>
                     <td className="px-4 py-3">
                       <StatusBadge status={o.status} />
                     </td>
                     <td className="px-4 py-3 text-ink-700">
-                      {new Date(o.createdAt).toLocaleString()}
+                      {new Date(o.createdAt).toLocaleString(locale)}
                     </td>
                     <td className="px-4 py-3 text-right">
                       <Link
                         to={`/orders/${o.id}`}
                         className="rounded-lg px-3 py-1.5 text-sm font-medium text-ink-900 hover:bg-black/5"
                       >
-                        Detalhes
+                        {t('details')}
                       </Link>
                     </td>
                   </tr>

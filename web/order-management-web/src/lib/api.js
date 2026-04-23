@@ -1,5 +1,13 @@
 const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'
 
+function getLocale() {
+  try {
+    return localStorage.getItem('om.locale') || 'pt-BR'
+  } catch {
+    return 'pt-BR'
+  }
+}
+
 async function http(path, options) {
   const res = await fetch(`${baseUrl}${path}`, {
     headers: {
@@ -16,7 +24,10 @@ async function http(path, options) {
     } catch {
       // ignore
     }
-    const msg = body?.title || body?.detail || `Falha na requisição: ${res.status}`
+    const locale = getLocale()
+    const fallback =
+      locale === 'en' ? `Request failed: ${res.status}` : `Falha na requisição: ${res.status}`
+    const msg = body?.title || body?.detail || fallback
     const err = new Error(msg)
     err.status = res.status
     err.body = body
