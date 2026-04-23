@@ -16,6 +16,7 @@ export const messages = {
     thStatus: 'Status',
     thCreatedAt: 'Criado em',
     loading: 'Carregando...',
+    waitingApi: 'Aguardando a API iniciar...',
     noOrders: 'Nenhum pedido ainda.',
     details: 'Detalhes',
 
@@ -61,6 +62,7 @@ export const messages = {
     thStatus: 'Status',
     thCreatedAt: 'Created',
     loading: 'Loading...',
+    waitingApi: 'Waiting for API to start...',
     noOrders: 'No orders yet.',
     details: 'Details',
 
