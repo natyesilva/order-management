@@ -16,6 +16,7 @@ public sealed class RabbitMqOrderEventPublisher(
     public Task PublishAsync(OrderCreatedEvent message, CancellationToken cancellationToken)
     {
         var messageId = Guid.NewGuid().ToString("N");
+        var eventType = "OrderCreated";
 
         using var connection = connectionFactory.CreateConnection();
         using var channel = connection.CreateModel();
@@ -34,11 +35,11 @@ public sealed class RabbitMqOrderEventPublisher(
         props.DeliveryMode = 2; // persistent
         props.MessageId = messageId;
         props.CorrelationId = message.OrderId.ToString();
-        props.Type = "OrderCreated";
+        props.Type = eventType;
         props.Timestamp = new AmqpTimestamp(DateTimeOffset.UtcNow.ToUnixTimeSeconds());
         props.Headers = new Dictionary<string, object>
         {
-            ["EventType"] = Encoding.UTF8.GetBytes("OrderCreated"),
+            ["EventType"] = Encoding.UTF8.GetBytes(eventType),
         };
 
         channel.BasicPublish(
@@ -48,7 +49,16 @@ public sealed class RabbitMqOrderEventPublisher(
             basicProperties: props,
             body: body);
 
-        logger.LogInformation("Evento OrderCreated publicado no RabbitMQ. OrderId={OrderId} MessageId={MessageId}", message.OrderId, messageId);
+        using (logger.BeginScope(new Dictionary<string, object>
+        {
+            ["orderId"] = message.OrderId,
+            ["correlationId"] = message.OrderId.ToString(),
+            ["eventType"] = eventType,
+            ["messageId"] = messageId,
+        }))
+        {
+            logger.LogInformation("Evento publicado no RabbitMQ.");
+        }
 
         return Task.CompletedTask;
     }

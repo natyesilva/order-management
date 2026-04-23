@@ -19,6 +19,7 @@ public sealed class OrderCreatedProcessor(
         string? correlationId,
         CancellationToken stoppingToken)
     {
+        var eventType = "OrderCreated";
         await using var scopeServices = services.CreateAsyncScope();
         var db = scopeServices.ServiceProvider.GetRequiredService<AppDbContext>();
 
@@ -61,6 +62,7 @@ public sealed class OrderCreatedProcessor(
 
         if (order.Status == OrderStatus.Pending)
         {
+            logger.LogInformation("Transição de status iniciada. From={From} To={To}", OrderStatus.Pending, OrderStatus.Processing);
             Transition(db, order, OrderStatus.Processing, now, "worker");
             await db.SaveChangesAsync(stoppingToken);
 
@@ -69,6 +71,7 @@ public sealed class OrderCreatedProcessor(
                 await Task.Delay(TimeSpan.FromSeconds(options.TransitionDelaySeconds), stoppingToken);
             }
             now = clock.UtcNow;
+            logger.LogInformation("Transição de status iniciada. From={From} To={To}", OrderStatus.Processing, OrderStatus.Completed);
             Transition(db, order, OrderStatus.Completed, now, "worker");
             await db.SaveChangesAsync(stoppingToken);
         }
@@ -82,7 +85,7 @@ public sealed class OrderCreatedProcessor(
             Id = Guid.NewGuid(),
             MessageId = messageId,
             CorrelationId = correlationId ?? payload.OrderId.ToString(),
-            EventType = "OrderCreated",
+            EventType = eventType,
             ProcessedAt = now
         });
 

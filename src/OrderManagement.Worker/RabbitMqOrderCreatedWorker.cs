@@ -37,17 +37,23 @@ public sealed class RabbitMqOrderCreatedWorker(
                 {
                     var messageId = args.BasicProperties?.MessageId ?? args.DeliveryTag.ToString();
                     var correlationId = args.BasicProperties?.CorrelationId;
+                    var eventType = args.BasicProperties?.Type
+                        ?? (args.BasicProperties?.Headers is not null
+                            && args.BasicProperties.Headers.TryGetValue("EventType", out var v)
+                            && v is byte[] b
+                                ? System.Text.Encoding.UTF8.GetString(b)
+                                : null);
 
                     using var _scope = logger.BeginScope(new Dictionary<string, object>
                     {
                         ["messageId"] = messageId,
-                        ["correlationId"] = correlationId ?? ""
+                        ["correlationId"] = correlationId ?? "",
+                        ["eventType"] = eventType ?? ""
                     });
 
-                    var type = args.BasicProperties?.Type;
-                    if (!string.Equals(type, "OrderCreated", StringComparison.Ordinal))
+                    if (!string.Equals(eventType, "OrderCreated", StringComparison.Ordinal))
                     {
-                        logger.LogWarning("Ignorando mensagem com Type={Type}", type);
+                        logger.LogWarning("Ignorando mensagem com EventType={EventType}", eventType);
                         channel.BasicAck(args.DeliveryTag, multiple: false);
                         return;
                     }
@@ -70,6 +76,11 @@ public sealed class RabbitMqOrderCreatedWorker(
                         channel.BasicAck(args.DeliveryTag, multiple: false);
                         return;
                     }
+
+                    using var _orderScope = logger.BeginScope(new Dictionary<string, object>
+                    {
+                        ["orderId"] = payload.OrderId,
+                    });
 
                     try
                     {

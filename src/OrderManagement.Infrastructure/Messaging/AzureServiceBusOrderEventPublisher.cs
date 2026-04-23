@@ -13,6 +13,7 @@ public sealed class AzureServiceBusOrderEventPublisher(
 {
     public async Task PublishAsync(OrderCreatedEvent message, CancellationToken cancellationToken)
     {
+        var eventType = "OrderCreated";
         var sender = client.CreateSender(options.QueueName);
 
         var body = JsonSerializer.SerializeToUtf8Bytes(message);
@@ -22,17 +23,23 @@ public sealed class AzureServiceBusOrderEventPublisher(
             ContentType = "application/json",
             MessageId = Guid.NewGuid().ToString("N"),
             CorrelationId = message.OrderId.ToString(),
-            Subject = "OrderCreated",
+            Subject = eventType,
         };
 
-        sbMessage.ApplicationProperties["EventType"] = "OrderCreated";
+        sbMessage.ApplicationProperties["EventType"] = eventType;
 
         await sender.SendMessageAsync(sbMessage, cancellationToken);
 
-        logger.LogInformation(
-            "Evento OrderCreated publicado no Azure Service Bus. OrderId={OrderId} MessageId={MessageId}",
-            message.OrderId,
-            sbMessage.MessageId);
+        using (logger.BeginScope(new Dictionary<string, object>
+        {
+            ["orderId"] = message.OrderId,
+            ["correlationId"] = message.OrderId.ToString(),
+            ["eventType"] = eventType,
+            ["messageId"] = sbMessage.MessageId,
+        }))
+        {
+            logger.LogInformation("Evento publicado no Azure Service Bus.");
+        }
     }
 }
 

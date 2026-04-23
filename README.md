@@ -43,6 +43,40 @@ flowchart LR
 
 Obs.: o tempo de espera pode ser configurado via `ORDER_STATUS_DELAY_SECONDS` (padrão: 5).
 
+## Tracing ponta a ponta (bônus)
+
+Este projeto usa **CorrelationId** para rastrear o fluxo completo (API → mensageria → worker):
+
+- No `POST /orders`, o **CorrelationId é igual ao OrderId** do pedido criado.
+  - Header: `X-Correlation-Id`
+- Na mensageria, o evento `OrderCreated` é publicado com:
+  - `CorrelationId = OrderId`
+  - `EventType = OrderCreated` (RabbitMQ: `Type` + header `EventType`; ASB: `Subject` + `EventType`)
+- No worker, o CorrelationId/EventType são lidos da mensagem e reutilizados em todos os logs.
+
+### Como validar manualmente
+
+1) Suba a stack (RabbitMQ local):
+
+```bash
+docker compose --env-file .env up --build
+```
+
+2) Crie um pedido (o `X-Correlation-Id` retornado será o `id` do pedido):
+
+```bash
+curl -i -X POST http://localhost:8080/orders ^
+  -H "Content-Type: application/json" ^
+  -d "{\"customer\":\"Acme\",\"product\":\"Produto X\",\"value\":10.00,\"quantity\":2}"
+```
+
+3) Procure o mesmo `correlationId`/`orderId` nos logs da API e do worker:
+
+```bash
+docker compose logs -f api
+docker compose logs -f worker
+```
+
 ## Execução local (Docker Compose) — RabbitMQ (padrão)
 
 Pré-requisitos:
