@@ -63,7 +63,7 @@ app.UseExceptionHandler(exceptionApp =>
 
         var problem = new ProblemDetails
         {
-            Title = "Unexpected error",
+            Title = "Erro inesperado",
             Status = StatusCodes.Status500InternalServerError,
             Detail = app.Environment.IsDevelopment() ? ex?.ToString() : null,
             Instance = context.Request.Path
@@ -102,16 +102,19 @@ using (var scope = app.Services.CreateScope())
 
     if (!ordersTableExists)
     {
-        try
+        if (app.Environment.IsDevelopment())
         {
-            // If the DB ended up in a partial-migrations state, ensure we start from a clean schema.
-            // This is acceptable for this MVP/local setup (Compose) and avoids "relation does not exist" at runtime.
-            await db.Database.ExecuteSqlRawAsync("DROP SCHEMA IF EXISTS public CASCADE;");
-            await db.Database.ExecuteSqlRawAsync("CREATE SCHEMA public;");
-        }
-        catch
-        {
-            // best effort
+            try
+            {
+                // If the DB ended up in a partial-migrations state, ensure we start from a clean schema.
+                // This is acceptable for local setup (Compose) and avoids "relation does not exist" at runtime.
+                await db.Database.ExecuteSqlRawAsync("DROP SCHEMA IF EXISTS public CASCADE;");
+                await db.Database.ExecuteSqlRawAsync("CREATE SCHEMA public;");
+            }
+            catch
+            {
+                // best effort
+            }
         }
 
         await db.Database.EnsureCreatedAsync();
