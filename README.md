@@ -65,8 +65,8 @@ docker compose --env-file .env up --build
 2) Crie um pedido (o `X-Correlation-Id` retornado será o `id` do pedido):
 
 ```bash
-curl -i -X POST http://localhost:8080/orders ^
-  -H "Content-Type: application/json" ^
+curl -i -X POST http://localhost:8080/orders \
+  -H "Content-Type: application/json" \
   -d "{\"customer\":\"Acme\",\"product\":\"Produto X\",\"value\":10.00,\"quantity\":2}"
 ```
 
@@ -110,9 +110,20 @@ Para usar Azure Service Bus de verdade, você precisa de uma **conta Azure** e d
 
 Obs.: nesse modo, o RabbitMQ pode ficar de pé (compose), mas não é usado (o transporte ativo é o Azure Service Bus).
 
-Observações:
-- A API aplica as migrations do EF Core automaticamente na inicialização.
-- A fila `orders` é declarada automaticamente no RabbitMQ pela API/worker (caso não exista).
+## Rodar testes
+
+```powershell
+$env:DOTNET_ROOT = "C:\\Program Files\\dotnet"
+dotnet test tests\\OrderManagement.Tests\\OrderManagement.Tests.csproj -c Release
+```
+
+Se aparecer erro de `hostfxr.dll not found`, confira:
+
+```powershell
+echo $env:DOTNET_ROOT
+where dotnet
+dotnet --info
+```
 
 ## Endpoints da API
 
@@ -147,3 +158,4 @@ Request (exemplo):
 - `src/OrderManagement.Api`: controllers + middleware + health checks
 - `src/OrderManagement.Worker`: consumers (RabbitMQ / Azure Service Bus) + idempotência + transições de status
 - `web/order-management-web`: UI em React (Tailwind + polling)
+
