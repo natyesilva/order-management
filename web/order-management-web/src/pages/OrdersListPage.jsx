@@ -79,7 +79,7 @@ export default function OrdersListPage() {
               ) : error ? (
                 <tr>
                   <td className="px-4 py-6 text-red-700" colSpan={8}>
-                    {error}
+                    {orders.length === 0 ? t('waitingApi') : error}
                   </td>
                 </tr>
               ) : orders.length === 0 ? (
