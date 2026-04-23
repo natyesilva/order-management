@@ -1,1 +1,11 @@
-{"Version":1,"Hash":"LVURpZUdJjVOYKd5pYjjOOt477+DsDjQUYT0nMJDoUg=","Source":"OrderManagement.Api","BasePath":"/","Mode":"Root","ManifestType":"Build","ReferencedProjectsConfiguration":[],"DiscoveryPatterns":[],"Assets":[],"Endpoints":[]}
+{
+  "Version": 1,
+  "Hash": "PPP6p1PujiB0RaMUyMfsDR7eMGVPul93Y3PesmXr5T0=",
+  "Source": "OrderManagement.Api",
+  "BasePath": "_content/OrderManagement.Api",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}

@@ -60,12 +60,12 @@ public sealed class OrderCreatedProcessor(
 
         if (order.Status == OrderStatus.Pending)
         {
-            Transition(order, OrderStatus.Processing, now, "worker");
+            Transition(db, order, OrderStatus.Processing, now, "worker");
             await db.SaveChangesAsync(stoppingToken);
 
             await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
             now = clock.UtcNow;
-            Transition(order, OrderStatus.Completed, now, "worker");
+            Transition(db, order, OrderStatus.Completed, now, "worker");
             await db.SaveChangesAsync(stoppingToken);
         }
         else
@@ -86,14 +86,15 @@ public sealed class OrderCreatedProcessor(
         await tx.CommitAsync(stoppingToken);
     }
 
-    private static void Transition(Order order, OrderStatus newStatus, DateTimeOffset changedAt, string source)
+    private static void Transition(AppDbContext db, Order order, OrderStatus newStatus, DateTimeOffset changedAt, string source)
     {
         if (order.Status == newStatus) return;
 
         var previous = order.Status;
         order.Status = newStatus;
         order.UpdatedAt = changedAt;
-        order.StatusHistory.Add(new OrderStatusHistory
+
+        var history = new OrderStatusHistory
         {
             Id = Guid.NewGuid(),
             OrderId = order.Id,
@@ -101,6 +102,11 @@ public sealed class OrderCreatedProcessor(
             NewStatus = newStatus,
             ChangedAt = changedAt,
             Source = source
-        });
+        };
+
+        // Explicitly add to DbSet to guarantee EF treats it as Added (INSERT),
+        // avoiding accidental UPDATE + concurrency exceptions.
+        db.OrderStatusHistories.Add(history);
+        order.StatusHistory.Add(history);
     }
 }

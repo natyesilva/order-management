@@ -4,28 +4,33 @@ MVP de um sistema de gestão de pedidos com:
 
 - API: .NET 8 Web API + EF Core
 - DB: PostgreSQL
-- Mensageria: Azure Service Bus (integração real via variáveis de ambiente)
+- Mensageria: RabbitMQ (fila “clássica”)
 - Worker: consome eventos `OrderCreated` e atualiza o status de forma assíncrona
 - Frontend: React + Vite + Tailwind (UI com polling)
-- Infra: Docker + Docker Compose (api, worker, frontend, postgres, pgadmin)
+- Infra: Docker + Docker Compose (api, worker, frontend, postgres, pgadmin, rabbitmq)
 
-## Architecture (Mermaid)
+## Por que RabbitMQ?
+
+Troquei o transporte de mensageria para RabbitMQ por **maior familiaridade/conhecimento prático** com a ferramenta, o que ajuda a entregar uma implementação mais rápida, consistente e fácil de manter para este MVP/teste técnico.
+
+## Arquitetura (Mermaid)
 
 ```mermaid
 flowchart LR
   UI[React Web] -->|REST| API[OrderManagement.Api]
   API -->|EF Core| PG[(PostgreSQL)]
-  API -->|Publish OrderCreated| ASB[(Azure Service Bus Queue)]
-  WK[OrderManagement.Worker] -->|Consume OrderCreated| ASB
+  API -->|Publish OrderCreated| RMQ[(RabbitMQ Queue)]
+  WK[OrderManagement.Worker] -->|Consume OrderCreated| RMQ
   WK -->|EF Core updates\n+ status history + idempotency| PG
 ```
 
 ## Fluxo de status
 
 1) `POST /orders` cria um `Order` com status `Pending` e grava a primeira linha em `OrderStatusHistory`
-2) A API publica uma mensagem no Service Bus:
+2) A API publica uma mensagem na fila RabbitMQ:
    - `CorrelationId = OrderId`
-   - `ApplicationProperties["EventType"] = "OrderCreated"`
+   - `Type = "OrderCreated"`
+   - `MessageId` gerado para idempotência
 3) O worker consome a mensagem (idempotente por `MessageId` persistido em `ProcessedMessage`)
 4) O worker atualiza o status:
    - `Pending -> Processing`
@@ -37,15 +42,8 @@ flowchart LR
 
 Pré-requisitos:
 - Docker Desktop
-- Transporte de mensageria:
-  - Padrão: outbox no Postgres (não precisa de Azure)
-  - Opcional: Azure Service Bus (ver abaixo)
 
-1) Crie o `.env` a partir do `.env.example` e preencha:
-- `ORDER_MESSAGING_TRANSPORT` (`outbox` or `servicebus`)
-- se `servicebus`:
-  - `AZURE_SERVICE_BUS_CONNECTION_STRING`
-  - opcionalmente `AZURE_SERVICE_BUS_QUEUE_NAME` (padrão: `orders`)
+1) Crie o `.env` a partir do `.env.example` e ajuste se quiser.
 
 2) Suba tudo:
 
@@ -58,20 +56,11 @@ Serviços:
 - Health: `http://localhost:8080/health`
 - Frontend: `http://localhost:5173`
 - PgAdmin: `http://localhost:5050`
+- RabbitMQ Management: `http://localhost:15672` (user/pass padrão: `guest`/`guest`)
 
 Observações:
 - A API aplica as migrations do EF Core automaticamente na inicialização.
-- Se estiver usando Service Bus, a API tenta criar a fila se as credenciais tiverem permissão de gerenciamento.
-
-## Configuração do Azure Service Bus
-
-Você precisa de uma fila e uma connection string:
-- Recomendado: use uma SAS policy com `Send` para a API e `Listen` para o worker.
-- Se você não tiver permissão de gerenciamento, crie a fila manualmente no Azure Portal.
-
-Variáveis de ambiente usadas:
-- `AZURE_SERVICE_BUS_CONNECTION_STRING` (necessária para o fluxo assíncrono ponta-a-ponta)
-- `AZURE_SERVICE_BUS_QUEUE_NAME` (padrão: `orders`)
+- A fila `orders` é declarada automaticamente pela API/worker (caso não exista).
 
 ## Endpoints da API
 
@@ -83,8 +72,8 @@ Request (exemplo):
 
 ```json
 {
-  "customer": "Acme Inc.",
-  "product": "Widget",
+  "customer": "Acme Ltda.",
+  "product": "Produto X",
   "value": 99.90
 }
 ```
@@ -94,8 +83,8 @@ Response (201) (exemplo):
 ```json
 {
   "id": "b3b6c61e-7bb8-4c88-99e7-0b0bf2c5e3e1",
-  "customer": "Acme Inc.",
-  "product": "Widget",
+  "customer": "Acme Ltda.",
+  "product": "Produto X",
   "value": 99.90,
   "status": "Pending",
   "createdAt": "2026-04-21T01:23:45.678Z",
@@ -124,7 +113,8 @@ Response (201) (exemplo):
 
 - `src/OrderManagement.Domain`: entities + enums
 - `src/OrderManagement.Application`: DTOs + casos de uso (order service) + contratos de mensagem
-- `src/OrderManagement.Infrastructure`: EF Core + publisher do Service Bus + DI
+- `src/OrderManagement.Infrastructure`: EF Core + RabbitMQ publisher + DI
 - `src/OrderManagement.Api`: controllers + middleware + health checks
-- `src/OrderManagement.Worker`: consumer do Service Bus + idempotência + transições de status
+- `src/OrderManagement.Worker`: consumer RabbitMQ + idempotência + transições de status
 - `web/order-management-web`: UI em React (Tailwind + polling)
+
