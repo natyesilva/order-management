@@ -44,14 +44,14 @@ public sealed class OrderService(
         _db.Add(order);
         await _db.SaveChangesAsync(cancellationToken);
 
-        logger.LogInformation("Order created: {OrderId}", order.Id);
+        logger.LogInformation("Pedido criado: {OrderId}", order.Id);
 
         await publisher.PublishAsync(
             new OrderCreatedEvent(order.Id, order.Customer, order.Product, order.Value, order.CreatedAt),
             cancellationToken);
 
         return await GetByIdAsync(order.Id, cancellationToken)
-            ?? throw new InvalidOperationException("Order was created but could not be reloaded.");
+            ?? throw new InvalidOperationException("O pedido foi criado, mas não foi possível recarregá-lo.");
     }
 
     public async Task<IReadOnlyList<OrderListItemResponse>> GetAllAsync(CancellationToken cancellationToken)

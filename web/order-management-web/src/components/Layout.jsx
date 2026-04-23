@@ -24,7 +24,7 @@ export default function Layout({ children }) {
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
           <Link to="/orders" className="group inline-flex items-baseline gap-2">
             <span className="text-lg font-semibold tracking-tight text-ink-900">
-              Order Management
+              Gestão de Pedidos
             </span>
             <span className="rounded-full bg-teal-50 px-2 py-0.5 text-xs font-medium text-teal-700 ring-1 ring-teal-200">
               MVP
@@ -32,8 +32,8 @@ export default function Layout({ children }) {
           </Link>
 
           <nav className="flex items-center gap-2 rounded-full bg-white/60 p-1 ring-1 ring-black/5">
-            <NavItem to="/orders">Orders</NavItem>
-            <NavItem to="/orders/new">New</NavItem>
+            <NavItem to="/orders">Pedidos</NavItem>
+            <NavItem to="/orders/new">Novo</NavItem>
           </nav>
         </div>
       </header>
@@ -42,7 +42,7 @@ export default function Layout({ children }) {
 
       <footer className="mx-auto max-w-6xl px-4 pb-10 pt-6 text-xs text-ink-700">
         <div className="flex flex-wrap items-center justify-between gap-2 border-t border-black/5 pt-4">
-          <span>Local dev UI for technical test.</span>
+          <span>UI local de desenvolvimento para o teste técnico.</span>
           <span className="font-mono text-[11px] opacity-70">
             API: {import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'}
           </span>
@@ -51,4 +51,3 @@ export default function Layout({ children }) {
     </div>
   )
 }
-

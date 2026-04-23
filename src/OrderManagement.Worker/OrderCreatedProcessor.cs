@@ -31,7 +31,7 @@ public sealed class OrderCreatedProcessor(
 
         if (already)
         {
-            logger.LogInformation("Message already processed. Skipping.");
+            logger.LogInformation("Mensagem já processada. Ignorando.");
             await tx.CommitAsync(stoppingToken);
             return;
         }
@@ -42,7 +42,9 @@ public sealed class OrderCreatedProcessor(
 
         if (order is null)
         {
-            logger.LogWarning("Order not found for message. Marking processed. OrderId={OrderId}", payload.OrderId);
+            logger.LogWarning(
+                "Pedido não encontrado para a mensagem. Marcando como processada. OrderId={OrderId}",
+                payload.OrderId);
             db.ProcessedMessages.Add(new ProcessedMessage
             {
                 Id = Guid.NewGuid(),
@@ -68,7 +70,7 @@ public sealed class OrderCreatedProcessor(
         }
         else
         {
-            logger.LogInformation("Order already transitioned. CurrentStatus={Status}", order.Status);
+            logger.LogInformation("Pedido já transicionado. StatusAtual={Status}", order.Status);
         }
 
         db.ProcessedMessages.Add(new ProcessedMessage
@@ -102,4 +104,3 @@ public sealed class OrderCreatedProcessor(
         });
     }
 }
-

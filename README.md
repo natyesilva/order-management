@@ -1,12 +1,12 @@
-# Order Management (Technical Test)
+# Gestão de Pedidos (Teste Técnico)
 
-MVP of an order management system with:
+MVP de um sistema de gestão de pedidos com:
 
 - API: .NET 8 Web API + EF Core
 - DB: PostgreSQL
-- Messaging: Azure Service Bus (real integration via env vars)
-- Worker: consumes `OrderCreated` events and updates status asynchronously
-- Frontend: React + Vite + Tailwind (polling UI)
+- Mensageria: Azure Service Bus (integração real via variáveis de ambiente)
+- Worker: consome eventos `OrderCreated` e atualiza o status de forma assíncrona
+- Frontend: React + Vite + Tailwind (UI com polling)
 - Infra: Docker + Docker Compose (api, worker, frontend, postgres, pgadmin)
 
 ## Architecture (Mermaid)
@@ -20,66 +20,66 @@ flowchart LR
   WK -->|EF Core updates\n+ status history + idempotency| PG
 ```
 
-## Status workflow
+## Fluxo de status
 
-1) `POST /orders` creates an `Order` with status `Pending` and writes a first row into `OrderStatusHistory`
-2) API publishes a Service Bus message:
+1) `POST /orders` cria um `Order` com status `Pending` e grava a primeira linha em `OrderStatusHistory`
+2) A API publica uma mensagem no Service Bus:
    - `CorrelationId = OrderId`
    - `ApplicationProperties["EventType"] = "OrderCreated"`
-3) Worker consumes the message (idempotent by `MessageId` persisted in `ProcessedMessage`)
-4) Worker updates status:
+3) O worker consome a mensagem (idempotente por `MessageId` persistido em `ProcessedMessage`)
+4) O worker atualiza o status:
    - `Pending -> Processing`
-   - waits 5 seconds
+   - aguarda 5 segundos
    - `Processing -> Completed`
-   - every transition writes a row into `OrderStatusHistory`
+   - cada transição grava uma linha em `OrderStatusHistory`
 
-## Local run (Docker Compose)
+## Execução local (Docker Compose)
 
-Prereqs:
+Pré-requisitos:
 - Docker Desktop
-- Messaging transport:
-  - Default: Postgres outbox (no Azure required)
-  - Optional: Azure Service Bus (see below)
+- Transporte de mensageria:
+  - Padrão: outbox no Postgres (não precisa de Azure)
+  - Opcional: Azure Service Bus (ver abaixo)
 
-1) Create `.env` from `.env.example` and fill:
+1) Crie o `.env` a partir do `.env.example` e preencha:
 - `ORDER_MESSAGING_TRANSPORT` (`outbox` or `servicebus`)
-- if `servicebus`:
+- se `servicebus`:
   - `AZURE_SERVICE_BUS_CONNECTION_STRING`
-  - optionally `AZURE_SERVICE_BUS_QUEUE_NAME` (default `orders`)
+  - opcionalmente `AZURE_SERVICE_BUS_QUEUE_NAME` (padrão: `orders`)
 
-2) Start everything:
+2) Suba tudo:
 
 ```bash
 docker compose --env-file .env up --build
 ```
 
-Services:
-- API: `http://localhost:8080` (Swagger in Development)
+Serviços:
+- API: `http://localhost:8080` (Swagger em Development)
 - Health: `http://localhost:8080/health`
 - Frontend: `http://localhost:5173`
 - PgAdmin: `http://localhost:5050`
 
-Notes:
-- The API applies EF Core migrations automatically on startup.
-- If using Service Bus, the API attempts to create the queue if the credentials include management rights.
+Observações:
+- A API aplica as migrations do EF Core automaticamente na inicialização.
+- Se estiver usando Service Bus, a API tenta criar a fila se as credenciais tiverem permissão de gerenciamento.
 
-## Azure Service Bus setup
+## Configuração do Azure Service Bus
 
-You need a queue and a connection string:
-- Recommended: use a SAS policy with `Send` for the API and `Listen` for the worker.
-- If you don't have management rights, create the queue manually in the Azure Portal.
+Você precisa de uma fila e uma connection string:
+- Recomendado: use uma SAS policy com `Send` para a API e `Listen` para o worker.
+- Se você não tiver permissão de gerenciamento, crie a fila manualmente no Azure Portal.
 
-Environment variables used:
-- `AZURE_SERVICE_BUS_CONNECTION_STRING` (required for end-to-end async status flow)
-- `AZURE_SERVICE_BUS_QUEUE_NAME` (default: `orders`)
+Variáveis de ambiente usadas:
+- `AZURE_SERVICE_BUS_CONNECTION_STRING` (necessária para o fluxo assíncrono ponta-a-ponta)
+- `AZURE_SERVICE_BUS_QUEUE_NAME` (padrão: `orders`)
 
-## API endpoints
+## Endpoints da API
 
-### Create order
+### Criar pedido
 
 `POST /orders`
 
-Request:
+Request (exemplo):
 
 ```json
 {
@@ -89,7 +89,7 @@ Request:
 }
 ```
 
-Response (201):
+Response (201) (exemplo):
 
 ```json
 {
@@ -112,19 +112,19 @@ Response (201):
 }
 ```
 
-### List orders
+### Listar pedidos
 
 `GET /orders`
 
-### Get order by id
+### Buscar pedido por id
 
 `GET /orders/{id}`
 
-## Project structure
+## Estrutura do projeto
 
 - `src/OrderManagement.Domain`: entities + enums
-- `src/OrderManagement.Application`: DTOs + use cases (order service) + message contracts
-- `src/OrderManagement.Infrastructure`: EF Core + Service Bus publisher + DI
+- `src/OrderManagement.Application`: DTOs + casos de uso (order service) + contratos de mensagem
+- `src/OrderManagement.Infrastructure`: EF Core + publisher do Service Bus + DI
 - `src/OrderManagement.Api`: controllers + middleware + health checks
-- `src/OrderManagement.Worker`: Service Bus consumer + idempotency + status transitions
-- `web/order-management-web`: React UI (Tailwind + polling)
+- `src/OrderManagement.Worker`: consumer do Service Bus + idempotência + transições de status
+- `web/order-management-web`: UI em React (Tailwind + polling)

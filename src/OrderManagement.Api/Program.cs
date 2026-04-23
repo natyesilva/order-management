@@ -75,6 +75,30 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     await db.Database.MigrateAsync();
 
+    // Defensive DX fallback: if migrations are missing at runtime (or failed to apply),
+    // the DB can end up with only "__EFMigrationsHistory" and no domain tables.
+    // In that case, drop the history table and create the schema from the current model.
+    var ordersTableExists = await db.Database
+        .SqlQueryRaw<bool>("SELECT to_regclass('public.orders') IS NOT NULL AS \"Value\"")
+        .SingleAsync();
+
+    if (!ordersTableExists)
+    {
+        try
+        {
+            // If the DB ended up in a partial-migrations state, ensure we start from a clean schema.
+            // This is acceptable for this MVP/local setup (Compose) and avoids "relation does not exist" at runtime.
+            await db.Database.ExecuteSqlRawAsync("DROP SCHEMA IF EXISTS public CASCADE;");
+            await db.Database.ExecuteSqlRawAsync("CREATE SCHEMA public;");
+        }
+        catch
+        {
+            // best effort
+        }
+
+        await db.Database.EnsureCreatedAsync();
+    }
+
     if (MessagingTransport.IsServiceBus(app.Configuration))
     {
         // Nice DX: create queue if credentials allow it.

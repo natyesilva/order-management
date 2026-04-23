@@ -13,15 +13,15 @@ public sealed class ServiceBusHealthCheck(
         CancellationToken cancellationToken = default)
     {
         if (MessagingTransport.IsOutbox(configuration))
-            return HealthCheckResult.Healthy("Using Postgres outbox transport.");
+            return HealthCheckResult.Healthy("Usando o transporte outbox do Postgres.");
 
         var cs = configuration["AZURE_SERVICE_BUS_CONNECTION_STRING"];
         if (string.IsNullOrWhiteSpace(cs))
-            return HealthCheckResult.Unhealthy("Azure Service Bus is not configured.");
+            return HealthCheckResult.Unhealthy("Azure Service Bus não está configurado.");
 
         var client = adminWrapper.Client;
         if (client is null)
-            return HealthCheckResult.Unhealthy("Azure Service Bus admin client could not be created.");
+            return HealthCheckResult.Unhealthy("Não foi possível criar o cliente de administração do Azure Service Bus.");
 
         var queueName = configuration["AZURE_SERVICE_BUS_QUEUE_NAME"] ?? "orders";
 
@@ -32,11 +32,11 @@ public sealed class ServiceBusHealthCheck(
         }
         catch (RequestFailedException ex)
         {
-            return HealthCheckResult.Unhealthy("Azure Service Bus check failed.", ex);
+            return HealthCheckResult.Unhealthy("Falha na verificação do Azure Service Bus.", ex);
         }
         catch (Exception ex)
         {
-            return HealthCheckResult.Unhealthy("Azure Service Bus check failed.", ex);
+            return HealthCheckResult.Unhealthy("Falha na verificação do Azure Service Bus.", ex);
         }
     }
 }

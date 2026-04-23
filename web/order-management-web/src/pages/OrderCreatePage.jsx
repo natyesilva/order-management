@@ -32,8 +32,8 @@ export default function OrderCreatePage() {
   return (
     <div className="mx-auto max-w-xl space-y-4">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-ink-900">New order</h1>
-        <p className="mt-1 text-sm text-ink-700">Creates an order with initial status Pending.</p>
+        <h1 className="text-2xl font-semibold tracking-tight text-ink-900">Novo pedido</h1>
+        <p className="mt-1 text-sm text-ink-700">Cria um pedido com status inicial Pendente.</p>
       </div>
 
       <form
@@ -41,11 +41,11 @@ export default function OrderCreatePage() {
         className="rounded-2xl border border-black/5 bg-white/70 p-5 shadow-sm ring-1 ring-black/5"
       >
         <label className="block">
-          <span className="text-sm font-medium text-ink-900">Customer</span>
+          <span className="text-sm font-medium text-ink-900">Cliente</span>
           <input
             value={customer}
             onChange={(e) => setCustomer(e.target.value)}
-            placeholder="Acme Inc."
+            placeholder="Acme Ltda."
             className="mt-1 w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm outline-none ring-teal-200 focus:ring-4"
             required
             minLength={2}
@@ -54,11 +54,11 @@ export default function OrderCreatePage() {
         </label>
 
         <label className="mt-4 block">
-          <span className="text-sm font-medium text-ink-900">Product</span>
+          <span className="text-sm font-medium text-ink-900">Produto</span>
           <input
             value={product}
             onChange={(e) => setProduct(e.target.value)}
-            placeholder="Widget"
+            placeholder="Produto X"
             className="mt-1 w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm outline-none ring-teal-200 focus:ring-4"
             required
             minLength={2}
@@ -67,7 +67,7 @@ export default function OrderCreatePage() {
         </label>
 
         <label className="mt-4 block">
-          <span className="text-sm font-medium text-ink-900">Value</span>
+          <span className="text-sm font-medium text-ink-900">Valor</span>
           <input
             value={value}
             onChange={(e) => setValue(e.target.value)}
@@ -90,10 +90,9 @@ export default function OrderCreatePage() {
           disabled={submitting}
           className="mt-5 inline-flex w-full items-center justify-center rounded-xl bg-ink-900 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-ink-700 disabled:opacity-60"
         >
-          {submitting ? 'Creating...' : 'Create'}
+          {submitting ? 'Criando...' : 'Criar'}
         </button>
       </form>
     </div>
   )
 }
-

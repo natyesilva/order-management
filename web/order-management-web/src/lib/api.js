@@ -16,7 +16,7 @@ async function http(path, options) {
     } catch {
       // ignore
     }
-    const msg = body?.title || body?.detail || `Request failed: ${res.status}`
+    const msg = body?.title || body?.detail || `Falha na requisição: ${res.status}`
     const err = new Error(msg)
     err.status = res.status
     err.body = body
@@ -41,4 +41,3 @@ export function createOrder(payload) {
     body: JSON.stringify(payload),
   })
 }
-

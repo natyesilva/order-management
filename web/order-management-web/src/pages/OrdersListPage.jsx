@@ -40,16 +40,16 @@ export default function OrdersListPage() {
     <div className="space-y-4">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-ink-900">Orders</h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-ink-900">Pedidos</h1>
           <p className="mt-1 text-sm text-ink-700">
-            Status updates are applied asynchronously by the worker.
+            As atualizações de status são aplicadas de forma assíncrona pelo worker.
           </p>
         </div>
         <Link
           to="/orders/new"
           className="inline-flex items-center justify-center rounded-xl bg-ink-900 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-ink-700"
         >
-          Create order
+          Criar pedido
         </Link>
       </div>
 
@@ -58,11 +58,11 @@ export default function OrdersListPage() {
           <table className="min-w-full text-left text-sm">
             <thead className="border-b border-black/5 bg-white/50">
               <tr className="text-ink-700">
-                <th className="px-4 py-3 font-medium">Customer</th>
-                <th className="px-4 py-3 font-medium">Product</th>
-                <th className="px-4 py-3 font-medium">Value</th>
+                <th className="px-4 py-3 font-medium">Cliente</th>
+                <th className="px-4 py-3 font-medium">Produto</th>
+                <th className="px-4 py-3 font-medium">Valor</th>
                 <th className="px-4 py-3 font-medium">Status</th>
-                <th className="px-4 py-3 font-medium">Created</th>
+                <th className="px-4 py-3 font-medium">Criado em</th>
                 <th className="px-4 py-3 font-medium"></th>
               </tr>
             </thead>
@@ -70,7 +70,7 @@ export default function OrdersListPage() {
               {loading ? (
                 <tr>
                   <td className="px-4 py-6 text-ink-700" colSpan={6}>
-                    Loading...
+                    Carregando...
                   </td>
                 </tr>
               ) : error ? (
@@ -82,7 +82,7 @@ export default function OrdersListPage() {
               ) : orders.length === 0 ? (
                 <tr>
                   <td className="px-4 py-6 text-ink-700" colSpan={6}>
-                    No orders yet.
+                    Nenhum pedido ainda.
                   </td>
                 </tr>
               ) : (
@@ -102,7 +102,7 @@ export default function OrdersListPage() {
                         to={`/orders/${o.id}`}
                         className="rounded-lg px-3 py-1.5 text-sm font-medium text-ink-900 hover:bg-black/5"
                       >
-                        Details
+                        Detalhes
                       </Link>
                     </td>
                   </tr>
@@ -115,4 +115,3 @@ export default function OrdersListPage() {
     </div>
   )
 }
-
