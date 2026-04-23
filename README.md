@@ -34,7 +34,7 @@ flowchart LR
 3) O worker consome a mensagem (idempotente por `MessageId` persistido em `ProcessedMessage`)
 4) O worker atualiza o status:
    - `Pending -> Processing`
-   - aguarda 5 segundos
+   - aguarda 10 segundos
    - `Processing -> Completed`
    - cada transição grava uma linha em `OrderStatusHistory`
 
