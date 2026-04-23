@@ -95,6 +95,14 @@ export default function OrderDetailPage() {
                 <div className="mt-1 text-sm font-medium text-ink-900">{money(order.value, locale)}</div>
               </div>
               <div>
+                <div className="text-xs font-medium uppercase tracking-wide text-ink-700">{t('thQuantity')}</div>
+                <div className="mt-1 text-sm font-medium text-ink-900">{order.quantity}</div>
+              </div>
+              <div>
+                <div className="text-xs font-medium uppercase tracking-wide text-ink-700">{t('thTotalValue')}</div>
+                <div className="mt-1 text-sm font-medium text-ink-900">{money(order.totalValue, locale)}</div>
+              </div>
+              <div>
                 <div className="text-xs font-medium uppercase tracking-wide text-ink-700">{t('thCreatedAt')}</div>
                 <div className="mt-1 text-sm font-medium text-ink-900">
                   {new Date(order.createdAt).toLocaleString(locale)}

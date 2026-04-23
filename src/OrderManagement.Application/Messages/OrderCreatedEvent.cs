@@ -5,6 +5,7 @@ public sealed record OrderCreatedEvent(
     string Customer,
     string Product,
     decimal Value,
+    int Quantity,
+    decimal TotalValue,
     DateTimeOffset CreatedAtUtc
 );
-

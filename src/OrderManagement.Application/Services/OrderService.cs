@@ -27,6 +27,8 @@ public sealed class OrderService(
             Customer = request.Customer.Trim(),
             Product = request.Product.Trim(),
             Value = request.Value,
+            Quantity = request.Quantity,
+            TotalValue = request.Value * request.Quantity,
             Status = OrderStatus.Pending,
             CreatedAt = now
         };
@@ -47,7 +49,7 @@ public sealed class OrderService(
         logger.LogInformation("Pedido criado: {OrderId}", order.Id);
 
         await publisher.PublishAsync(
-            new OrderCreatedEvent(order.Id, order.Customer, order.Product, order.Value, order.CreatedAt),
+            new OrderCreatedEvent(order.Id, order.Customer, order.Product, order.Value, order.Quantity, order.TotalValue, order.CreatedAt),
             cancellationToken);
 
         return await GetByIdAsync(order.Id, cancellationToken)
@@ -64,6 +66,8 @@ public sealed class OrderService(
                 o.Customer,
                 o.Product,
                 o.Value,
+                o.Quantity,
+                o.TotalValue,
                 o.Status,
                 o.CreatedAt,
                 o.UpdatedAt))
@@ -84,6 +88,8 @@ public sealed class OrderService(
             order.Customer,
             order.Product,
             order.Value,
+            order.Quantity,
+            order.TotalValue,
             order.Status,
             order.CreatedAt,
             order.UpdatedAt,

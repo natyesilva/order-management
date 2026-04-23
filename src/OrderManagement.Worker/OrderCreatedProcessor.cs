@@ -10,6 +10,7 @@ namespace OrderManagement.Worker;
 public sealed class OrderCreatedProcessor(
     IServiceProvider services,
     IClock clock,
+    OrderProcessingOptions options,
     ILogger<OrderCreatedProcessor> logger)
 {
     public async Task ProcessAsync(
@@ -63,7 +64,10 @@ public sealed class OrderCreatedProcessor(
             Transition(db, order, OrderStatus.Processing, now, "worker");
             await db.SaveChangesAsync(stoppingToken);
 
-            await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
+            if (options.TransitionDelaySeconds > 0)
+            {
+                await Task.Delay(TimeSpan.FromSeconds(options.TransitionDelaySeconds), stoppingToken);
+            }
             now = clock.UtcNow;
             Transition(db, order, OrderStatus.Completed, now, "worker");
             await db.SaveChangesAsync(stoppingToken);

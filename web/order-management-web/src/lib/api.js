@@ -25,8 +25,7 @@ async function http(path, options) {
       // ignore
     }
     const locale = getLocale()
-    const fallback =
-      locale === 'en' ? `Request failed: ${res.status}` : `Falha na requisição: ${res.status}`
+    const fallback = locale === 'en' ? `Request failed: ${res.status}` : `Falha na requisição: ${res.status}`
     const msg = body?.title || body?.detail || fallback
     const err = new Error(msg)
     err.status = res.status
@@ -52,3 +51,4 @@ export function createOrder(payload) {
     body: JSON.stringify(payload),
   })
 }
+

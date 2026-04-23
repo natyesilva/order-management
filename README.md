@@ -37,11 +37,13 @@ flowchart LR
 3) O worker consome a mensagem (idempotente por `MessageId` persistido em `ProcessedMessage`)
 4) O worker atualiza o status:
    - `Pending -> Processing`
-   - aguarda 10 segundos
+   - aguarda 5 segundos
    - `Processing -> Completed`
    - cada transição grava uma linha em `OrderStatusHistory`
 
-## Execução local (Docker Compose)
+Obs.: o tempo de espera pode ser configurado via `ORDER_STATUS_DELAY_SECONDS` (padrão: 5).
+
+## Execução local (Docker Compose) — RabbitMQ (padrão)
 
 Pré-requisitos:
 - Docker Desktop
@@ -76,7 +78,7 @@ Obs.: nesse modo, o RabbitMQ pode ficar de pé (compose), mas não é usado (o t
 
 Observações:
 - A API aplica as migrations do EF Core automaticamente na inicialização.
-- A fila `orders` é declarada automaticamente pela API/worker (caso não exista).
+- A fila `orders` é declarada automaticamente no RabbitMQ pela API/worker (caso não exista).
 
 ## Endpoints da API
 
@@ -90,30 +92,8 @@ Request (exemplo):
 {
   "customer": "Acme Ltda.",
   "product": "Produto X",
-  "value": 99.90
-}
-```
-
-Response (201) (exemplo):
-
-```json
-{
-  "id": "b3b6c61e-7bb8-4c88-99e7-0b0bf2c5e3e1",
-  "customer": "Acme Ltda.",
-  "product": "Produto X",
   "value": 99.90,
-  "status": "Pending",
-  "createdAt": "2026-04-21T01:23:45.678Z",
-  "updatedAt": null,
-  "statusHistory": [
-    {
-      "id": "f5a8d0c0-1b4b-4b98-9d1e-4ac2b5a48ed1",
-      "previousStatus": null,
-      "newStatus": "Pending",
-      "changedAt": "2026-04-21T01:23:45.678Z",
-      "source": "api"
-    }
-  ]
+  "quantity": 2
 }
 ```
 
@@ -129,8 +109,7 @@ Response (201) (exemplo):
 
 - `src/OrderManagement.Domain`: entities + enums
 - `src/OrderManagement.Application`: DTOs + casos de uso (order service) + contratos de mensagem
-- `src/OrderManagement.Infrastructure`: EF Core + RabbitMQ publisher + DI
+- `src/OrderManagement.Infrastructure`: EF Core + publishers (RabbitMQ / Azure Service Bus) + DI
 - `src/OrderManagement.Api`: controllers + middleware + health checks
-- `src/OrderManagement.Worker`: consumer RabbitMQ + idempotência + transições de status
+- `src/OrderManagement.Worker`: consumers (RabbitMQ / Azure Service Bus) + idempotência + transições de status
 - `web/order-management-web`: UI em React (Tailwind + polling)
-

@@ -7,8 +7,9 @@ public sealed record OrderListItemResponse(
     string Customer,
     string Product,
     decimal Value,
+    int Quantity,
+    decimal TotalValue,
     OrderStatus Status,
     DateTimeOffset CreatedAt,
     DateTimeOffset? UpdatedAt
 );
-

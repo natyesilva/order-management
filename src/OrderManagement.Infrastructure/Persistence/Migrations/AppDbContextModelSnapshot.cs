@@ -38,8 +38,14 @@ partial class AppDbContextModelSnapshot : ModelSnapshot
                 .HasMaxLength(200)
                 .HasColumnType("character varying(200)");
 
+            b.Property<int>("Quantity")
+                .HasColumnType("integer");
+
             b.Property<int>("Status")
                 .HasColumnType("integer");
+
+            b.Property<decimal>("TotalValue")
+                .HasColumnType("numeric(18,2)");
 
             b.Property<DateTimeOffset?>("UpdatedAt")
                 .HasColumnType("timestamp with time zone");
