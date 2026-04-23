@@ -102,7 +102,8 @@ using (var scope = app.Services.CreateScope())
 
     if (!ordersTableExists)
     {
-        if (app.Environment.IsDevelopment())
+        var allowDbReset = string.Equals(builder.Configuration["ALLOW_DB_RESET"], "true", StringComparison.OrdinalIgnoreCase);
+        if (app.Environment.IsDevelopment() || allowDbReset)
         {
             try
             {
@@ -115,6 +116,11 @@ using (var scope = app.Services.CreateScope())
             {
                 // best effort
             }
+        }
+        else
+        {
+            // In non-dev environments, refuse to auto-reset the schema.
+            throw new InvalidOperationException("Database schema is missing required tables (orders). Set ALLOW_DB_RESET=true for local/dev or apply migrations correctly.");
         }
 
         await db.Database.EnsureCreatedAsync();

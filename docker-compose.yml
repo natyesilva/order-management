@@ -50,9 +50,12 @@ services:
       context: .
       dockerfile: src/OrderManagement.Api/Dockerfile
     environment:
+      ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://0.0.0.0:8080
       # Local default: RabbitMQ. For Azure Service Bus use: ORDER_MESSAGING_TRANSPORT=servicebus
       ORDER_MESSAGING_TRANSPORT: ${ORDER_MESSAGING_TRANSPORT:-rabbitmq}
+      # Allows resetting DB schema when a partial/invalid state is detected (local/dev only).
+      ALLOW_DB_RESET: "true"
       POSTGRES_CONNECTION_STRING: Host=postgres;Port=5432;Database=${POSTGRES_DB:-order_management};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:-postgres}
       ConnectionStrings__Postgres: Host=postgres;Port=5432;Database=${POSTGRES_DB:-order_management};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:-postgres}
       # Dentro da rede do Docker Compose, o host correto é o nome do service: "rabbitmq".
