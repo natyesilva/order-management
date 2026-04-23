@@ -63,7 +63,7 @@ public sealed class OrderCreatedProcessor(
             Transition(db, order, OrderStatus.Processing, now, "worker");
             await db.SaveChangesAsync(stoppingToken);
 
-            await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
+            await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
             now = clock.UtcNow;
             Transition(db, order, OrderStatus.Completed, now, "worker");
             await db.SaveChangesAsync(stoppingToken);
