@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { createOrder } from '../lib/api.js'
+import { useI18n } from '../lib/i18n/I18nProvider.jsx'
 
 export default function OrderCreatePage() {
+  const { t } = useI18n()
   const navigate = useNavigate()
   const [customer, setCustomer] = useState('')
   const [product, setProduct] = useState('')
@@ -32,8 +34,8 @@ export default function OrderCreatePage() {
   return (
     <div className="mx-auto max-w-xl space-y-4">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-ink-900">Novo pedido</h1>
-        <p className="mt-1 text-sm text-ink-700">Cria um pedido com status inicial Pendente.</p>
+        <h1 className="text-2xl font-semibold tracking-tight text-ink-900">{t('newOrderTitle')}</h1>
+        <p className="mt-1 text-sm text-ink-700">{t('newOrderSubtitle')}</p>
       </div>
 
       <form
@@ -41,7 +43,7 @@ export default function OrderCreatePage() {
         className="rounded-2xl border border-black/5 bg-white/70 p-5 shadow-sm ring-1 ring-black/5"
       >
         <label className="block">
-          <span className="text-sm font-medium text-ink-900">Cliente</span>
+          <span className="text-sm font-medium text-ink-900">{t('customer')}</span>
           <input
             value={customer}
             onChange={(e) => setCustomer(e.target.value)}
@@ -54,7 +56,7 @@ export default function OrderCreatePage() {
         </label>
 
         <label className="mt-4 block">
-          <span className="text-sm font-medium text-ink-900">Produto</span>
+          <span className="text-sm font-medium text-ink-900">{t('product')}</span>
           <input
             value={product}
             onChange={(e) => setProduct(e.target.value)}
@@ -67,7 +69,7 @@ export default function OrderCreatePage() {
         </label>
 
         <label className="mt-4 block">
-          <span className="text-sm font-medium text-ink-900">Valor</span>
+          <span className="text-sm font-medium text-ink-900">{t('value')}</span>
           <input
             value={value}
             onChange={(e) => setValue(e.target.value)}
@@ -90,7 +92,7 @@ export default function OrderCreatePage() {
           disabled={submitting}
           className="mt-5 inline-flex w-full items-center justify-center rounded-xl bg-ink-900 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-ink-700 disabled:opacity-60"
         >
-          {submitting ? 'Criando...' : 'Criar'}
+          {submitting ? t('creating') : t('create')}
         </button>
       </form>
     </div>
